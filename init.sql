@@ -1,0 +1,2 @@
+GRANT SELECT, INSERT, UPDATE ON snippetbox.* TO 'devuser'@'%';
+FLUSH PRIVILEGES;
