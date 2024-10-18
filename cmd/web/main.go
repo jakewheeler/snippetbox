@@ -21,22 +21,25 @@ func main() {
 	connStr := flag.String("dsn", "devuser:devpassword@tcp(127.0.0.1:3306)/snippetbox?parseTime=true", "MySQL data connection string")
 	flag.Parse()
 
-	app := &application{
-		logger: slog.New(slog.NewTextHandler(os.Stdout, nil)),
-	}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
 	db, err := openDb(*connStr)
 	if err != nil {
-		app.logger.Error(err.Error())
+		logger.Error(err.Error())
 		os.Exit(1)
 	}
 	defer db.Close()
 
-	app.logger.Info("starting server", slog.String("addr", *addr))
+	app := &application{
+		logger:   logger,
+		snippets: &models.SnippetModel{DB: db},
+	}
+
+	logger.Info("starting server", slog.String("addr", *addr))
 
 	err = http.ListenAndServe(*addr, app.routes())
 
-	app.logger.Error(err.Error())
+	logger.Error(err.Error())
 	os.Exit(1)
 }
 
